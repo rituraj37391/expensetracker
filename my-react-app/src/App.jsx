@@ -1,19 +1,26 @@
 import { useMemo, useState } from "react";
 import "./App.css";
 
-const initialForm = {
-  description: "",
-  date: "",
-  category: "",
-  amount: "",
+const getToday = () => {
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${today.getFullYear()}-${month}-${day}`;
 };
 
+const createInitialForm = () => ({
+  description: "",
+  date: getToday(),
+  category: "",
+  amount: "",
+});
+
 const categoryColors = {
-  Food: "#f29b63",
-  Travel: "#6b9ce7",
-  Shopping: "#b28ae3",
-  Bills: "#e5c34e",
-  Other: "#63b58a",
+  Food: "#ff8a65",
+  Travel: "#58a6d9",
+  Shopping: "#a779e9",
+  Bills: "#edbd4f",
+  Other: "#50b89b",
 };
 
 const formatCurrency = (amount) =>
@@ -25,7 +32,7 @@ const formatCurrency = (amount) =>
 
 function App() {
   const [expenses, setExpenses] = useState([]);
-  const [form, setForm] = useState(initialForm);
+  const [form, setForm] = useState(createInitialForm);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,7 +52,7 @@ function App() {
       ...prev,
       { ...form, id: Date.now(), description: form.description.trim(), amount },
     ]);
-    setForm(initialForm);
+    setForm(createInitialForm());
   };
 
   const deleteExpense = (id) => {
@@ -126,6 +133,8 @@ function App() {
                 placeholder="e.g. Chai, Petrol"
                 value={form.description}
                 onChange={handleChange}
+                pattern=".*\S.*"
+                title="Please enter a description."
                 required
               />
             </label>
@@ -150,18 +159,21 @@ function App() {
                 <option value="Other">Other</option>
               </select>
             </label>
-            <label className="form-field form-field--wide">
+            <label className="form-field">
               Amount
-              <input
-                type="number"
-                name="amount"
-                min="0.01"
-                step="0.01"
-                placeholder="₹ 0.00"
-                value={form.amount}
-                onChange={handleChange}
-                required
-              />
+              <span className="currency-input">
+                <span className="currency-prefix" aria-hidden="true">₹</span>
+                <input
+                  type="number"
+                  name="amount"
+                  min="0.01"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={form.amount}
+                  onChange={handleChange}
+                  required
+                />
+              </span>
             </label>
             <button type="submit" className="submit-button">Add expense</button>
           </form>
